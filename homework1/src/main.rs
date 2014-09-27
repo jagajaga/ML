@@ -18,7 +18,7 @@ fn main() {
             |&x| from_str(x).expect("lolwhat")).collect::<Vec<f32>>()).collect();
     let fst_norm = norm(data.iter().map(|x| x[0]).collect());
     let snd_norm = norm(data.iter().map(|x| x[1]).collect());
-    let mut normalized_data : Vec<Vec<f32>> = data.iter().map(|x| vec![x[0] / fst_norm, x[1] / snd_norm, x[2]]).collect();
+    let mut normalized_data : Vec<[f32, .. 3]> = data.iter().map(|x| [x[0] / fst_norm, x[1] / snd_norm, x[2]]).collect();
     let slice = normalized_data.as_mut_slice();
     task_rng.shuffle(slice);
 }
