@@ -1,5 +1,6 @@
 use std::io::BufferedReader;
 use std::io::File;
+use std::rand::{task_rng, Rng};
 
 fn norm(numbers : Vec<f32>) -> f32 {
     let mut result = 0f32;
@@ -17,7 +18,8 @@ fn main() {
             |&x| from_str(x).expect("lolwhat")).collect::<Vec<f32>>()).collect();
     let fst_norm = norm(data.iter().map(|x| x[0]).collect());
     let snd_norm = norm(data.iter().map(|x| x[1]).collect());
-    let normalized_data : Vec<Vec<f32>> = data.iter().map(|x| vec![x[0] / fst_norm, x[1] / snd_norm, x[2]]).collect();
-    println!("{} and {}", norm(normalized_data.iter().map(|x| x[0]).collect()), norm(normalized_data.iter().map(|x| x[1]).collect()));
+    let mut normalized_data : Vec<Vec<f32>> = data.iter().map(|x| vec![x[0] / fst_norm, x[1] / snd_norm, x[2]]).collect();
+    let slice = normalized_data.as_mut_slice();
+    task_rng.shuffle(slice);
 }
 
