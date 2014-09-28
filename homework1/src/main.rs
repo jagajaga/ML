@@ -46,6 +46,16 @@ struct TestResult {
     false_negative : uint,
 }
 
+impl TestResult {
+    fn sum(&self, a : &TestResult) -> TestResult {
+        TestResult {
+            true_positive : self.true_positive + a.true_positive, 
+            false_positive : self.false_positive + a.false_positive, 
+            false_negative : self.false_negative + a.false_negative, 
+        }
+    }
+}
+
 fn test(data : &mut DataVec, k : uint, test : & DataVec) -> TestResult {
     let mut true_positive = 0u;
     let mut false_positive = 0u;
@@ -76,6 +86,18 @@ fn f1(test_result : &TestResult) -> Scalar {
     let recall = test_result.true_positive as Scalar / (test_result.true_positive + test_result.false_negative) as Scalar;
     2.0 * prec * recall / (prec + recall)
 }
+
+//fn get_best_k(data : &mut DataVec, test : & DataVec) -> uint {
+    //let part = data.len() / 4;
+    //let fst = data.slice(0, part);
+    //let snd = data.slice(part, part * 2);
+    //let trd = data.slice(part * 2 + 1, part * 3);
+    //let fth = data.slice(part * 3 + 1, data.len());
+    //let mut result = 0;
+    //for i in range(1i, 9) {
+        
+    //}
+//}
 
 fn main() {
     let path = Path::new("data/data-set.txt");
