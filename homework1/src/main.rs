@@ -71,6 +71,12 @@ fn test(data : &mut DataVec, k : uint, test : & DataVec) -> TestResult {
     }
 }
 
+fn f1(test_result : &TestResult) -> Scalar {
+    let prec = test_result.true_positive as Scalar / (test_result.true_positive + test_result.false_positive) as Scalar;
+    let recall = test_result.true_positive as Scalar / (test_result.true_positive + test_result.false_negative) as Scalar;
+    2.0 * prec * recall / (prec + recall)
+}
+
 fn main() {
     let path = Path::new("data/data-set.txt");
     let mut file = BufferedReader::new(File::open(&path));
