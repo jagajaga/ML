@@ -40,6 +40,37 @@ fn knn(data : &mut DataVec, k : uint, point : Point) -> bool {
     if result < 0 { false } else { true }
 }
 
+struct TestResult {
+    true_positive : uint,
+    false_positive : uint,
+    false_negative : uint,
+}
+
+fn test(data : &mut DataVec, k : uint, test : & DataVec) -> TestResult {
+    let mut true_positive = 0u;
+    let mut false_positive = 0u;
+    let mut false_negative = 0u;
+
+    for &(point, expected) in test.iter() {
+        let result = knn(data, k, point);
+        if result && (result == expected) {
+            true_positive += 1;
+        }
+        if result && (result != expected) {
+            false_positive += 1;
+        }
+        if !result && (result != expected) {
+            false_negative += 1;
+        }
+    }
+
+    TestResult {
+        true_positive : true_positive,
+        false_positive : false_positive,
+        false_negative : false_negative,
+    }
+}
+
 fn main() {
     let path = Path::new("data/data-set.txt");
     let mut file = BufferedReader::new(File::open(&path));
