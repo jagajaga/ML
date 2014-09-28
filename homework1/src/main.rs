@@ -5,6 +5,8 @@ use std::rand::{task_rng, Rng};
 type Scalar = f64;
 type DataVec = Vec<(Point, bool)>;
 
+
+#[deriving(PartialEq,Show)]
 struct Point {
     x : Scalar,
     y : Scalar,
@@ -56,7 +58,7 @@ impl TestResult {
     }
 }
 
-fn test(data : &mut DataVec, k : uint, test : & DataVec) -> TestResult {
+fn test(data : &mut DataVec, k : uint, test : &[(Point,bool)]) -> TestResult {
     let mut true_positive = 0u;
     let mut false_positive = 0u;
     let mut false_negative = 0u;
@@ -87,17 +89,24 @@ fn f1(test_result : &TestResult) -> Scalar {
     2.0 * prec * recall / (prec + recall)
 }
 
-//fn get_best_k(data : &mut DataVec, test : & DataVec) -> uint {
-    //let part = data.len() / 4;
-    //let fst = data.slice(0, part);
-    //let snd = data.slice(part, part * 2);
-    //let trd = data.slice(part * 2 + 1, part * 3);
-    //let fth = data.slice(part * 3 + 1, data.len());
-    //let mut result = 0;
-    //for i in range(1i, 9) {
-        
-    //}
-//}
+fn get_best_k(data : &mut DataVec) -> uint {
+    let part = data.len() / 4;
+    let fst = (data.slice(0, part));
+    let snd = (data.slice(part + 1, part * 2));
+    let trd = (data.slice(part * 2 + 1, part * 3));
+    let fth = (data.slice(part * 3 + 1, data.len()));
+    let mut result = 0.0;
+    let mut best_k : uint = 0;
+    for k in range(1u, 9) {
+        let f1_result = f1(&test(data.iter().filter(|&x| !fst.contains(x)).collect(), k, fst));
+        //f1(&test(data.iter().filter(|&x| !fst.contains(x)).collect(), k, fst).sum(test(data.iter().filter(|&x| !snd.contains(x)).collect(), k, snd)).sum(test(data.iter().filter(|&x| !trd.contains(x)).collect(), k, trd)).sum(test(data.iter().filter(|&x| !fth.contains(x)).collect(), k, fth)));
+        if result < f1_result {
+            result = f1_result;
+            best_k = k;
+        }
+    }
+    1
+}
 
 fn main() {
     let path = Path::new("data/data-set.txt");
