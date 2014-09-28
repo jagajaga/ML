@@ -17,15 +17,17 @@ fn distance(a : Point, b : Point) -> Scalar {
 }
 
 fn norm(numbers : Vec<Scalar>) -> Scalar {
-    let mut result : Scalar = 0.0;
-    for &i in numbers.iter() {
-        result += i;
-    }
-    result / numbers.len() as Scalar
+    numbers.iter().fold(0.0, |sum, &x| sum + x) / numbers.len() as Scalar
 }
 
 fn knn(data : &mut DataVec, k : uint, point : Point) -> bool {
-//    data.sort_by(|a, b| a.cmp(b, point));
+    data.sort_by(|&(a, _), &(b, _)| {
+            let da = distance(a, point);
+            let db = distance(b, point);
+            if da < db { Less }
+            else if da > db { Greater }
+            else { Equal }
+    });
     false
 }
 
@@ -38,8 +40,7 @@ fn main() {
     let norm0 = norm(data.iter().map(|x| x[0]).collect());
     let norm1 = norm(data.iter().map(|x| x[1]).collect());
     let mut normalized_data : DataVec = data.iter().map(|v| (Point { x: v[0] / norm0, y: v[1] / norm1 }, v[2] != 0.0) ).collect();
-    let mut rng = task_rng();
-    rng.shuffle(normalized_data.as_mut_slice());
+    task_rng().shuffle(normalized_data.as_mut_slice());
     println!("{}", knn(&mut normalized_data, 2, Point {x: 0.5, y: 0.25} ));
 }
 
