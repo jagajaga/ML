@@ -17,7 +17,7 @@ fn distance(a : (f32, f32), b : (f32, f32)) -> f32 {
 }
 
 // 1nn
-fn simple(data : Vec<[f32, .. 3]>, point : (f32, f32)) -> bool {
+fn simple(data : &Vec<[f32, .. 3]>, point : (f32, f32)) -> bool {
     let mut min = std::f32::MAX_VALUE;
     let mut value = false;
     for v in data.iter() {
@@ -39,8 +39,9 @@ fn main() {
     let fst_norm = norm(data.iter().map(|x| x[0]).collect());
     let snd_norm = norm(data.iter().map(|x| x[1]).collect());
     let mut normalized_data : Vec<[f32, .. 3]> = data.iter().map(|x| [x[0] / fst_norm, x[1] / snd_norm, x[2]]).collect();
-//    let slice = normalized_data.as_mut_slice();
-//    task_rng.shuffle(slice);
-    simple(normalized_data, (0.5, 0.4));
+    let mut rng = task_rng();
+    rng.shuffle(normalized_data.as_mut_slice());
+    println!("{}", simple(&normalized_data, (0.5, 0.4)));
+    println!("{}", normalized_data.iter().map(|x| x.as_slice()).collect::<Vec<&[f32]>>());
 }
 
