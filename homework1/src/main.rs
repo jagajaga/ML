@@ -17,7 +17,7 @@ fn distance(a : Point, b : Point) -> Scalar {
 }
 
 fn norm(numbers : Vec<Scalar>) -> Scalar {
-    numbers.iter().fold(0.0, |sum, &x| sum + x) / numbers.len() as Scalar
+    numbers.iter().fold(0.0, |sum, &x| sum + x.abs()) / numbers.len() as Scalar
 }
 
 fn knn(data : &mut DataVec, k : uint, point : Point) -> bool {
