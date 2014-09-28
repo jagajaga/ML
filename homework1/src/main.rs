@@ -28,7 +28,16 @@ fn knn(data : &mut DataVec, k : uint, point : Point) -> bool {
             else if da > db { Greater }
             else { Equal }
     });
-    false
+    let mut result : i32 = 0;
+    data.iter().map(|&(_, a)| {
+        if a {
+            result -= 1;
+        }
+        else {
+            result += 1;
+        }
+    });
+    if result < 0 { false } else { true }
 }
 
 fn main() {
