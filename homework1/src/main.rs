@@ -22,9 +22,9 @@ fn simple(data : &Vec<[f32, .. 3]>, point : (f32, f32)) -> bool {
     let mut value = false;
     for v in data.iter() {
         let d = distance(point, (v[0], v[1]));
-        if (d < min) {
+        if d < min {
             min = d;
-            value = (v[2] != 0f32);
+            value = v[2] != 0f32;
         }
     }
     value
