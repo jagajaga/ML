@@ -29,7 +29,7 @@ fn knn(data : &mut DataVec, k : uint, point : Point) -> bool {
             else { Equal }
     });
     let mut result : i32 = 0;
-    data.iter().map(|&(_, a)| {
+    data.slice_to(k).iter().map(|&(_, a)| {
         if a {
             result -= 1;
         }
