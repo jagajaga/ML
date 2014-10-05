@@ -5,7 +5,6 @@ use std::rand::{task_rng, Rng};
 type Scalar = f64;
 type DataVec = Vec<(Point, bool)>;
 
-
 #[deriving(PartialEq,Show,Clone)]
 struct Point {
     x : Scalar,
@@ -94,15 +93,18 @@ fn f1(test_result : &TestResult) -> Scalar {
 
 fn get_best_k(data : &DataVec) -> uint {
     let part = data.len() / 4;
-    let fst = (data.slice(0, part));
-    let snd = (data.slice(part + 1, part * 2));
-    let trd = (data.slice(part * 2 + 1, part * 3));
-    let fth = (data.slice(part * 3 + 1, data.len()));
+    let fst = data.slice(0, part);
+    let snd = data.slice(part + 1, part * 2);
+    let trd = data.slice(part * 2 + 1, part * 3);
+    let fth = data.slice(part * 3 + 1, data.len());
     let mut result = 0f64;
     let mut best_k : uint = 0;
     for k in range(1u, fth.len()) {
         if k % 2 == 0 { continue; }
-        let f1_result = f1(&test(&data.iter().filter(|&x| !fst.contains(x)).map(|&x| x).collect::<DataVec>(), k, fst).sum(&test(&data.iter().filter(|&x| !snd.contains(x)).map(|&x| x).collect::<DataVec>(), k, snd)).sum(&test(&data.iter().filter(|&x| !trd.contains(x)).map(|&x| x).collect::<DataVec>(), k, trd)).sum(&test(&data.iter().filter(|&x| !fth.contains(x)).map(|&x| x).collect::<DataVec>(), k, fth)));
+        let f1_result = f1(&test(&data.iter().filter(|&x| !fst.contains(x)).map(|&x| x).collect::<DataVec>(), k, fst)
+                           .sum(&test(&data.iter().filter(|&x| !snd.contains(x)).map(|&x| x).collect::<DataVec>(), k, snd))
+                                .sum(&test(&data.iter().filter(|&x| !trd.contains(x)).map(|&x| x).collect::<DataVec>(), k, trd))
+                                    .sum(&test(&data.iter().filter(|&x| !fth.contains(x)).map(|&x| x).collect::<DataVec>(), k, fth)));
         if result < f1_result {
             result = f1_result;
             best_k = k;
@@ -119,13 +121,14 @@ fn main() {
             |&x| from_str(x).expect("lolwhat")).collect::<Vec<Scalar>>()).collect();
     let norm0 = norm(data.iter().map(|x| x[0]).collect());
     let norm1 = norm(data.iter().map(|x| x[1]).collect());
+    println!("norm0 {}\nnorm1 {}", norm0, norm1);
     let mut normalized_data : DataVec = data.iter().map(|v| (Point { x: v[0] / norm0, y: v[1] / norm1 }, v[2] != 0.0) ).collect();
     task_rng().shuffle(normalized_data.as_mut_slice());
-    let learning_data = (normalized_data.slice(0, normalized_data.len() / 5 * 4)).to_vec();
-    let test_data = (normalized_data.slice(normalized_data.len() / 5 * 4 + 1, normalized_data.len()));
+    let learning_data = normalized_data.slice(0, normalized_data.len() / 5 * 4).to_vec();
+    let test_data = normalized_data.slice(normalized_data.len() / 5 * 4 + 1, normalized_data.len());
     let best_k = get_best_k(&learning_data);
     let test_debug = test(&learning_data, best_k, test_data);
     let result = f1(&test_debug);
-    println!("result: {}", result);
+    println!("best k: {}\ntest_result: {}\nresult: {}", best_k, test_debug, result);
 }
 
