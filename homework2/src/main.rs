@@ -1,5 +1,8 @@
-use std::io::BufferedReader;
-use std::io::File;
+struct Message {
+    subject : Vec<uint>,
+    text : Vec<uint>,
+    is_spam : bool,
+}
 
 fn main() {
 }
