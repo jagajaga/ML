@@ -20,7 +20,7 @@ fn main() {
                 if value.is_file() {
                     let mut buf = BufferedReader::new(File::open(&value));
                     let mut file = buf.lines();
-                    let is_spam = value.as_str().expect("No a file?").contains("spmsg");
+                    let is_spam = value.as_str().unwrap().contains("spmsg");
                     let subject = 
                     file.next().map(
                             |x| x.ok().unwrap().as_slice().trim_right_chars('\n').slice_from("Subject: ".len()).split(' ').filter(|x| !x.is_empty()).map(
