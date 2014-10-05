@@ -1,7 +1,7 @@
 use std::io::fs;
 use std::io::BufferedReader;
 use std::io::File;
-use std::io;
+use std::io::fs::PathExtensions;
 
 #[deriving(PartialEq,Show,Clone)]
 struct Message {
