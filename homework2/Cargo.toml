@@ -1,0 +1,9 @@
+[package]
+
+name = "task2"
+version = "0.0.1"
+authors = [ "Ivan Gromakovsky <gie1994@gmail.com>", "Arseniy Seroka <ars.seroka@gmail.com>" ]
+
+[[bin]]
+
+name = "main"
