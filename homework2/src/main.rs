@@ -3,6 +3,7 @@ use std::io::BufferedReader;
 use std::io::File;
 use std::io::fs::PathExtensions;
 use std::collections::HashMap;
+use std::collections::hashmap::{Occupied, Vacant};
 
 #[deriving(PartialEq,Show,Clone)]
 struct Message {
@@ -11,18 +12,19 @@ struct Message {
     is_spam : bool,
 }
 
+#[deriving(PartialEq,Show,Clone)]
 struct Classifier {
     spam_probability : HashMap<uint, f64>,
 }
 
 fn increment_map_value(map : &mut HashMap<uint, uint>, key : & uint) {
-    let x = map.find_mut(key);
-    match (x) {
-        Some(n) => *n += 1,
-        None => {
-            map.insert(*key, 1u);
+    match map.entry(*key) {
+        Vacant(entry) => entry.set(1u),
+        Occupied(mut entry) => {
+            *entry.get_mut() += 1;
+            entry.into_mut()
         },
-    }
+    };
 }
 
 impl Classifier {
@@ -139,7 +141,7 @@ fn main() {
         let mut false_negative = 0u;
         for msg in msgs_array[i].iter() {
             let expected = msg.is_spam;
-            let result = cls.is_spam(msg);
+            let result = cls.clone().is_spam(msg);
 
             if result && (result == expected) {
                 true_positive += 1;
