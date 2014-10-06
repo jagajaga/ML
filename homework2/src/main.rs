@@ -77,6 +77,23 @@ impl Classifier {
     }
 }
 
+#[deriving(PartialEq,Show,Clone)]
+struct TestResult {
+    true_positive : uint,
+    false_positive : uint,
+    false_negative : uint,
+}
+
+impl TestResult {
+    fn sum(&self, a : &TestResult) -> TestResult {
+        TestResult {
+            true_positive : self.true_positive + a.true_positive, 
+            false_positive : self.false_positive + a.false_positive, 
+            false_negative : self.false_negative + a.false_negative, 
+        }
+    }
+}
+
 fn main() {
     let mut msgs_array = Vec::new();
     let folder = Path::new("data");
@@ -116,8 +133,23 @@ fn main() {
             }
         }
         let cls = Classifier::new(&data);
+
+        let mut true_positive = 0u;
+        let mut false_positive = 0u;
+        let mut false_negative = 0u;
         for msg in msgs_array[i].iter() {
-            cls.is_spam(msg);
+            let expected = msg.is_spam;
+            let result = cls.is_spam(msg);
+
+            if result && (result == expected) {
+                true_positive += 1;
+            }
+            if result && (result != expected) {
+                false_positive += 1;
+            }
+            if !result && (result != expected) {
+                false_negative += 1;
+            }
         }
     }
 }
