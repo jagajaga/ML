@@ -61,15 +61,16 @@ impl Classifier {
     }
 
     pub fn is_spam(self, msg : & Message) -> bool {
-        let spam_f : f64 = 0.0;
-        let not_spam_f : f64 = 0.0;
+        let mut spam_f : f64 = 0.0;
+        let mut not_spam_f : f64 = 0.0;
         for word in msg.subject.iter() {
             let x = self.spam_probability.find(word);
             match (x) {
                 Some(v) => {
                     spam_f -= v.ln();
-                    not_spam_f -= (1 - v).ln();
+                    not_spam_f -= (1.0 - *v).ln();
                 },
+                None => (),
             }
         }
         spam_f < not_spam_f
