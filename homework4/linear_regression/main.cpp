@@ -1,7 +1,6 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
-
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/operation.hpp>
 #include <boost/numeric/ublas/lu.hpp>
@@ -46,9 +45,12 @@ namespace
    };
 }
 
-int main()
+int main(int argc, char ** argv)
 {
    std::ifstream in("prices.txt");
+   if (argc == 2) {
+       in.open(argv[1], std::ifstream::in);
+   }
    if (in.fail())
    {
       std::cerr << "Couldn't open input file" << std::endl;
