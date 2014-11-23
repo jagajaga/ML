@@ -58,17 +58,17 @@ namespace
       {
          size_t learning_n = std::min(boost::size(learning_data), limit);
          matrix_t X(learning_n, 3);
-         for (size_t i = 0; i != learning_n; ++i)
+         matrix_t Y(learning_n, 1);
+         size_t i = 0;
+         for (auto const & flat : learning_data)
          {
             X(i, 0) = 1;
-            X(i, 1) = flats[i].square;
-            X(i, 2) = flats[i].rooms_count;
-         }
-
-         matrix_t Y(learning_n, 1);
-         for (size_t i = 0; i != learning_n; ++i)
-         {
-            Y(i, 0) = flats[i].price;
+            X(i, 1) = flat.square;
+            X(i, 2) = flat.rooms_count;
+            Y(i, 0) = flat.price;
+            ++i;
+            if (i >= limit)
+                break;
          }
 
          auto X_transposed = boost::numeric::ublas::trans(X);
@@ -81,11 +81,14 @@ namespace
          matrix_t betas(3, 1);
          boost::numeric::ublas::axpy_prod(product2, Y, betas, true);
 
+         betas_[0] = betas(0, 0);
+         betas_[1] = betas(1, 0);
+         betas_[2] = betas(2, 0);
       }
 
-      unsigned operator()(unsigned square, unsigned rooms_cout) const
+      unsigned operator()(unsigned square, unsigned rooms_count) const
       {
-         return 0;
+         return betas_[0] + betas_[1] * square + betas_[2] * rooms_count;
       }
 
    private:
@@ -133,8 +136,20 @@ int main(int argc, char ** argv)
    }
 
    size_t learning_n = flats.size() * 4 / 5;
+   unsigned sum = 0;
+   unsigned square = 0;
+   for (size_t i = 0; i != learning_n; ++i)
+   {
+       sum += flats[i].price;
+       square += flats[i].square;
+   }
+   std::cout << "Average " << double(sum) / square << std::endl;
    flat_price_calculator_t flat_price_calculator(flats, learning_n);
 
-   std::cout << rmse(flats, flat_price_calculator); // FIXME
+   std::cout << flat_price_calculator(1, 1) << std::endl;
+
+   std::vector<flat_t> test_data(flats.begin() + learning_n, flats.end());
+   //std::cout << rmse(test_data, flat_price_calculator);
    return 0;
 }
+
