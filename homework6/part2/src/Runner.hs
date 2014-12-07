@@ -27,46 +27,27 @@ interpret :: [Double] -> Int
 interpret v = fromJust (elemIndex (maximum v) v)
 
 isMatch :: (Eq a) => a -> a -> Int
-isMatch x y =
-  if x == y
-  then 1
-  else 0
+isMatch x y = if x == y then 1 else 0
 
 type LabelledImage = ([Double], Int)
 
-trainOnePattern
-  :: (NeuralNet n)
-  => LabelledImage
-  -> n
-  -> n
+trainOnePattern :: (NeuralNet n) => LabelledImage -> n -> n
 trainOnePattern trainingData net = train net input target
   where input = fst trainingData
         digit = snd trainingData
         target = targets !! digit
 
-trainWithAllPatterns
-  :: (NeuralNet n)
-  => n
-  -> [LabelledImage]
-  -> n
+trainWithAllPatterns :: (NeuralNet n) => n -> [LabelledImage] -> n
 trainWithAllPatterns = foldr trainOnePattern
 
-evalOnePattern
-  :: (NeuralNet n)
-  => n
-  -> LabelledImage
-  -> Int
+evalOnePattern :: (NeuralNet n) => n -> LabelledImage -> Int
 evalOnePattern net trainingData = isMatch result target
   where input = fst trainingData
         target = snd trainingData
         rawResult = evaluate net input
         result = interpret rawResult
 
-evalAllPatterns
-  :: (NeuralNet n)
-  => n
-  -> [LabelledImage]
-  -> [Int]
+evalAllPatterns :: (NeuralNet n) => n -> [LabelledImage] -> [Int]
 evalAllPatterns = map . evalOnePattern
 
 

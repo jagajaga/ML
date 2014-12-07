@@ -19,20 +19,13 @@ instance Show Layer where
 inputWidth :: Layer -> Int
 inputWidth = cols . lW
 
-outputWidth :: Layer -> Int
-outputWidth = rows . lW
-
-data PropagatedLayer
-    = PropagatedLayer {
-          pIn  :: ColumnVector Double,
-          pOut :: ColumnVector Double,
-          pF'a :: ColumnVector Double,
-          pW   :: Matrix Double,
-          pAS  :: ActivationSpec
-        }
-    | PropagatedSensorLayer {
-          pOut :: ColumnVector Double
-        }
+data PropagatedLayer = PropagatedLayer { pIn  :: ColumnVector Double,
+                                         pOut :: ColumnVector Double,
+                                         pF'a :: ColumnVector Double,
+                                         pW   :: Matrix Double,
+                                         pAS  :: ActivationSpec
+                                       }
+                                       | PropagatedSensorLayer { pOut :: ColumnVector Double }
 
 instance Show PropagatedLayer where
     show (PropagatedLayer x y f'a w s) =
@@ -77,8 +70,7 @@ instance Show BackpropagatedLayer where
         ++ ", w=" ++ show (bpW layer)
         ++ ", activationFunction=?, activationFunction'=?"
 
-backpropagateFinalLayer ::
-    PropagatedLayer -> ColumnVector Double -> BackpropagatedLayer
+backpropagateFinalLayer :: PropagatedLayer -> ColumnVector Double -> BackpropagatedLayer
 backpropagateFinalLayer l t = BackpropagatedLayer { bpDazzle = dazzle,
       bpErrGrad = errorGrad dazzle f'a (pIn l),
       bpF'a     = pF'a l,
@@ -119,21 +111,14 @@ data BackpropNet = BackpropNet { layers       :: [Layer]
                                , learningRate :: Double
                                } deriving Show
 
-buildBackpropNet ::
-  Double ->
-  [Matrix Double] ->
-  ActivationSpec ->
-  BackpropNet
+buildBackpropNet :: Double -> [Matrix Double] -> ActivationSpec -> BackpropNet
 buildBackpropNet lr ws s = BackpropNet { layers = ls, learningRate = lr }
   where checkedWeights = scanl1 checkDimensions ws
         ls             = map buildLayer checkedWeights
         buildLayer w   = Layer { lW = w, lAS = s }
 
 checkDimensions :: Matrix Double -> Matrix Double -> Matrix Double
-checkDimensions w1 w2 =
-  if rows w1 == cols w2
-       then w2
-       else error "Inconsistent dimensions in weight matrix"
+checkDimensions w1 w2 = if rows w1 == cols w2 then w2 else error "Inconsistent dimensions in weight matrix"
 
 propagateNet :: ColumnVector Double -> BackpropNet -> [PropagatedLayer]
 propagateNet input net = tail calcs
@@ -144,10 +129,7 @@ propagateNet input net = tail calcs
 validateInput :: BackpropNet -> ColumnVector Double -> ColumnVector Double
 validateInput net = validateInputValues . validateInputDimensions net
 
-validateInputDimensions ::
-    BackpropNet ->
-    ColumnVector Double ->
-    ColumnVector Double
+validateInputDimensions :: BackpropNet -> ColumnVector Double -> ColumnVector Double
 validateInputDimensions net input =
   if got == expected
        then input
@@ -164,8 +146,7 @@ validateInputValues input =
              max = maximum ns
              ns  = toList ( flatten input )
 
-backpropagateNet ::
-  ColumnVector Double -> [PropagatedLayer] -> [BackpropagatedLayer]
+backpropagateNet :: ColumnVector Double -> [PropagatedLayer] -> [BackpropagatedLayer]
 backpropagateNet target layers = scanr backpropagate layerL hiddenLayers
   where hiddenLayers = init layers
         layerL       = backpropagateFinalLayer (last layers) target
@@ -207,4 +188,5 @@ tanhAS = ActivationSpec { asF = tanh
                         , desc = "tanh"
                         }
 
+tanh' :: Double -> Double
 tanh' x = 1 - (tanh x)^2
