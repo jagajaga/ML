@@ -29,7 +29,7 @@ def entropy_binary(p):
 
 def data_entropy(data):
     total = len(data)
-    positive_count = len([filter(lambda d: d.label == 1, data)])
+    positive_count = len(list(filter(lambda d: d.label == 1, data)))
     p_pos = positive_count / float(total)
     return entropy_binary(p_pos)
 
@@ -37,9 +37,10 @@ def data_entropy(data):
 def information_gain(data, split_func):
     entropy = data_entropy(data)
     new_entropy = 0
-    parts = [itertools.filterfalse(split_func, data)], [filter(split_func, data)]
+    parts = list(itertools.filterfalse(split_func, data)), list(filter(split_func, data))
     for part in parts:
-        new_entropy += float(len(part)) / len(data) * data_entropy(part)
+        part_len = len(part)
+        new_entropy += float(part_len) / len(data) * data_entropy(part) if part_len else 0
 
     return entropy - new_entropy
 
