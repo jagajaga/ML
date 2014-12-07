@@ -1,5 +1,7 @@
 import itertools
 
+import datum
+
 
 class DecisionTree():
     def __init__(self, value, avg_features=None, left=None, right=None, split_feature_idx=None):
@@ -14,7 +16,7 @@ class DecisionTree():
             print('_' * indentation + str(self.value))
         else:
             to_print = 'f_{} > {}'.format(self.split_feature_idx, self.avg_features[self.split_feature_idx])
-            print('_' * indentation, to_print)
+            print('_' * indentation + to_print)
             self.left.print(indentation + len(to_print))
             self.right.print(indentation + len(to_print))
 
@@ -41,14 +43,23 @@ class DecisionTreeBuilder():
         self.avg_features = [x / float(len(train_data)) for x in self.sum_features]
 
     def _build_decision_tree_(self, train_data):
+        all_the_same = datum.all_the_same(train_data)
+        if all_the_same is not None:
+            return DecisionTree(all_the_same)
         max_split_quality = 0
+        best_idx = 0
         for split_feature_idx in range(self.features_count):
             split_f = lambda d: d.features[split_feature_idx] > self.avg_features[split_feature_idx]
             split_quality = self.quality_function(train_data, split_f)
+            assert split_quality >= 0
             if split_quality > max_split_quality:
+                max_split_quality = split_quality
                 best_idx = split_feature_idx
 
-        return DecisionTree(None, self.avg_features, DecisionTree(1), DecisionTree(-1), 1)
+        split_f = lambda d: d.features[best_idx] > self.avg_features[best_idx]
+        left_tree = self._build_decision_tree_(list(itertools.filterfalse(split_f, train_data)))
+        right_tree = self._build_decision_tree_(list(filter(split_f, train_data)))
+        return DecisionTree(None, self.avg_features, left_tree, right_tree, best_idx)
 
     def build(self):
         return self._build_decision_tree_(self.train_data)
