@@ -17,11 +17,6 @@ randomWeightMatrix :: Int -> Int -> Int -> Matrix Double
 randomWeightMatrix numInputs numOutputs seed = (numOutputs><numInputs) weights
     where weights = take (numOutputs*numInputs) (smallRandoms seed)
 
-zeroWeightMatrix :: Int -> Int -> Matrix Double
-zeroWeightMatrix numInputs numOutputs = (numOutputs><numInputs) weights
-    where weights = repeat 0
-
-
 main :: IO ()
 main = do
   let w1 = randomWeightMatrix (28*28 + 1) 20 7
