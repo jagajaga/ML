@@ -56,22 +56,15 @@ pseudoMagnitude m = sqrt (sum msms)
     where ms = toList (flatten m)
           msms = zipWith (*) ms ms
 
--- | Inputs, outputs and targets are represented as column vectors instead of lists
 type ColumnVector a = Matrix a
 
--- | Convert a list to a column vector
 listToColumnVector :: (Ord a, Field a)
-    -- | the list to convert
     => [a]
-    -- | the resulting column vector
     -> ColumnVector a
 listToColumnVector x = (len N.><1 ) x
     where len = length x
 
--- | Convert a column vector to a list
 columnVectorToList :: (Ord a, Field a)
-    -- | The column vector to convert
     => ColumnVector a
-    -- | The resulting list
     -> [a]
 columnVectorToList = toList . flatten

@@ -33,7 +33,6 @@ isMatch x y =
   else 0
 
 type LabelledImage = ([Double], Int)
--- ^ The training set, an array of input/target pairs
 
 trainOnePattern
   :: (NeuralNet n)

@@ -6,11 +6,11 @@ import           Numeric.LinearAlgebra as N
 
 class NeuralNet n where
   evaluate
-    :: n        -- ^ The neural net
-    -> [Double] -- ^ The input pattern
-    -> [Double] -- ^ The output pattern
+    :: n       
+    -> [Double]
+    -> [Double]
   train
-    :: n        -- ^ The neural net before training
-    -> [Double] -- ^ The input pattern
-    -> [Double] -- ^ The target pattern
-    -> n        -- ^ The neural net after training
+    :: n       
+    -> [Double]
+    -> [Double]
+    -> n       
