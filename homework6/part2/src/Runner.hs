@@ -7,6 +7,7 @@ import           NeuralNet
 import           Data.List
 import           Data.Maybe
 import           Numeric.LinearAlgebra
+import Control.Parallel.Strategies
 
 targets :: [[Double]]
 targets =
@@ -48,7 +49,8 @@ evalOnePattern net trainingData = isMatch result target
         result = interpret rawResult
 
 evalAllPatterns :: (NeuralNet n) => n -> [LabelledImage] -> [Int]
-evalAllPatterns = map . evalOnePattern
+evalAllPatterns = pmap . evalOnePattern
+    where pmap f x = (map f x) `using` parList rdeepseq
 
 
 readTrainingData :: IO [LabelledImage]

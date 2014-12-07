@@ -28,11 +28,11 @@ main = do
   let w2 = randomWeightMatrix 20 10 42
   let initialNet = buildBackpropNet learningRate [w1, w2] tanhAS
   trainingData2 <- readTrainingData
-  let trainingData = take 40000 trainingData2
+  let trainingData = take 100000 trainingData2
   putStrLn $ "Training with " ++ show (length trainingData) ++ " images"
   let finalNet = trainWithAllPatterns initialNet trainingData
   testData2 <- readTestData
-  let testData = take 1000 testData2
+  let testData = take 100000 testData2
   putStrLn $ "Testing with " ++ show (length testData) ++ " images"
   let results = evalAllPatterns finalNet testData
   let score = fromIntegral (sum results)
