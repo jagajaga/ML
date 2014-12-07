@@ -16,8 +16,8 @@ class DecisionTree():
             print('_' * indentation + str(self.value))
         else:
             to_print = 'f_{} > {}'.format(self.split_feature_idx, self.avg_features[self.split_feature_idx])
-            print('_' * indentation + to_print)
             self.left.print(indentation + len(to_print))
+            print('_' * indentation + to_print)
             self.right.print(indentation + len(to_print))
 
     def check(self, features):
@@ -28,6 +28,12 @@ class DecisionTree():
             return self.value
         else:
             return self.right.classify(features) if self.check(features) else self.left.classify(features)
+
+    def prune(self):
+        self.avg_features = None
+        self.left = None
+        self.right = None
+        self.split_feature_idx = None
 
 
 # Note: assuming that all datums have the same number of features
@@ -65,8 +71,40 @@ class DecisionTreeBuilder():
         return self._build_decision_tree_(self.train_data)
 
 
+def count_if(tree, predicate):
+    if tree.value is not None:
+        return predicate(tree.value)
+    else:
+        return count_if(tree.left, predicate) + count_if(tree.right, predicate)
+
+
+def majority(tree):
+    return 1 if count_if(tree, lambda x: x == 1) > count_if(tree, lambda x: x == -1) else -1
+
+
+class DecisionTreePruner(object):
+    def __init__(self, tree, valid_data):
+        self.tree = tree
+        self.valid_data = valid_data
+
+    def _prune_(self, child):
+        mistakes = test_decision_tree(self.tree, self.valid_data)
+        child.value = majority(child)
+        new_mistakes = test_decision_tree(self.tree, self.valid_data)
+        print(mistakes, new_mistakes)
+        if mistakes >= new_mistakes:
+            child.prune()
+        else:
+            child.value = None
+            self._prune_(child.left)
+            self._prune_(child.right)
+
+    def prune(self):
+        self._prune_(self.tree)
+
+
 def prune_decision_tree(tree, valid_data):
-    pass
+    DecisionTreePruner(tree, valid_data).prune()
 
 
 def test_decision_tree(tree, test_data):
@@ -75,7 +113,11 @@ def test_decision_tree(tree, test_data):
         expected = datum.label
         calculated = tree.classify(datum.features)
         mistakes += (expected != calculated)
+    return mistakes
 
+
+def test_decision_tree_and_print(tree, test_data):
+    mistakes = test_decision_tree(tree, test_data)
     print('Tested decision tree on data of size {}, it made {} mistakes ({}%)'.format(len(test_data),
                                                                                       mistakes,
                                                                                       100. * mistakes / len(test_data))

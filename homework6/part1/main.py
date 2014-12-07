@@ -47,9 +47,9 @@ def information_gain(data, split_func):
 
 def run_tests(tree, train_data, valid_data):
     print('Testing decision tree on train data')
-    decision_tree.test_decision_tree(tree, train_data)
+    decision_tree.test_decision_tree_and_print(tree, train_data)
     print('Testing decision tree on valid data')
-    decision_tree.test_decision_tree(tree, valid_data)
+    decision_tree.test_decision_tree_and_print(tree, valid_data)
 
 
 def main():
