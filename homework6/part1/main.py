@@ -45,6 +45,16 @@ def information_gain(data, split_func):
     return entropy - new_entropy
 
 
+def gini_gain(data, split_func):
+    sum_squares = 0
+    parts = list(itertools.filterfalse(split_func, data)), list(filter(split_func, data))
+    for part in parts:
+        part_len = len(part)
+        sum_squares += (float(part_len) / len(data)) ** 2
+
+    return 1 - sum_squares
+
+
 def run_tests(tree, train_data, valid_data):
     print('Testing decision tree on train data')
     decision_tree.test_decision_tree_and_print(tree, train_data)
@@ -59,7 +69,8 @@ def main():
         valid_data = read_data(data_file, labels_file)
 
     quality_functions = {
-        'IGain': information_gain
+        'IGain': information_gain,
+        'GiniGain': gini_gain,
     }
     for quality_function_name, quality_function in quality_functions.items():
         print('Using', quality_function_name)
