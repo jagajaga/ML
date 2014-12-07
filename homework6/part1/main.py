@@ -45,6 +45,13 @@ def information_gain(data, split_func):
     return entropy - new_entropy
 
 
+def run_tests(tree, train_data, valid_data):
+    print('Testing decision tree on train data')
+    decision_tree.test_decision_tree(tree, train_data)
+    print('Testing decision tree on valid data')
+    decision_tree.test_decision_tree(tree, valid_data)
+
+
 def main():
     with open(TRAIN_DATA_NAME, 'r') as data_file, open(TRAIN_LABELS_NAME, 'r') as labels_file:
         train_data = read_data(data_file, labels_file)
@@ -57,9 +64,14 @@ def main():
     for quality_function_name, quality_function in quality_functions.items():
         print('Using', quality_function_name)
         tree_builder = decision_tree.DecisionTreeBuilder(train_data, quality_function)
+        print('Building decision tree...')
         tree = tree_builder.build()
+        tree.print()
+        run_tests(tree, train_data, valid_data)
+        print('Pruning decision tree...')
         decision_tree.prune_decision_tree(tree, valid_data)
         tree.print()
+        run_tests(tree, train_data, valid_data)
 
 if __name__ == '__main__':
     main()

@@ -64,5 +64,19 @@ class DecisionTreeBuilder():
     def build(self):
         return self._build_decision_tree_(self.train_data)
 
+
 def prune_decision_tree(tree, valid_data):
     pass
+
+
+def test_decision_tree(tree, test_data):
+    mistakes = 0
+    for datum in test_data:
+        expected = datum.label
+        calculated = tree.classify(datum.features)
+        mistakes += (expected != calculated)
+
+    print('Tested decision tree on data of size {}, it made {} mistakes ({}%)'.format(len(test_data),
+                                                                                      mistakes,
+                                                                                      100. * mistakes / len(test_data))
+    )
